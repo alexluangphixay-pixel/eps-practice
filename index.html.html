@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ซ้อมสอบ EPS">
+<meta name="theme-color" content="#1E4DA1">
+<title>ซ้อมสอบทักษะ EPS</title>
+<style>
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --ink:#172033; --muted:#566176; --line:#D3DAE5;
+  --blue:#1E4DA1; --on-blue:#FFFFFF; --blue-soft:#DCE6F7;
+  --red:#B8352D; --red-soft:#F8E0DD; --green:#1B7552; --green-soft:#D7EEE3;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0F141D; --surface:#182131; --ink:#E8EDF5; --muted:#9FABBD; --line:#2C3749;
+    --blue:#86AAF2; --on-blue:#0E1626; --blue-soft:#1E2D4B;
+    --red:#F29088; --red-soft:#3A2220; --green:#6FCFA2; --green-soft:#183629;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:16px/1.6 -apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","Thonburi","Noto Sans Thai",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+#app{max-width:520px;margin:0 auto;padding:16px 16px 48px;min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+/* home */
+.home-title{font-size:26px;font-weight:700;line-height:1.35;margin:12px 0 2px}
+.home-sub{color:var(--muted);margin:0 0 16px}
+.seg{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--blue-soft);margin-bottom:14px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:9px;background:transparent;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink)}
+.deck{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.emblem{flex:none;width:56px;height:56px;border-radius:14px;background:var(--blue);color:var(--on-blue);display:grid;place-items:center;font-size:28px;font-weight:700}
+.deck-main{flex:1;min-width:0}
+.deck-name{font-weight:700}
+.deck-meta{color:var(--muted);font-size:14px}
+.track{height:6px;border-radius:3px;background:var(--blue-soft);margin-top:8px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--green)}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.chip{min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--blue-soft);border-color:var(--blue)}
+.note{background:var(--red-soft);border-radius:12px;padding:10px 12px;font-size:14px;margin:10px 0}
+.note.calm{background:var(--blue-soft)}
+.small{color:var(--muted);font-size:14px}
+
+/* session */
+.top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.icon-btn{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.top-title{flex:1;font-weight:700}
+.top-count{color:var(--muted);font-variant-numeric:tabular-nums}
+.prog{height:4px;background:var(--blue-soft);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.prog i{display:block;height:100%;background:var(--blue)}
+.task{color:var(--muted);font-size:14px;margin:0 0 8px}
+.q{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--blue);border-radius:16px;padding:18px;font-size:28px;line-height:1.5;font-weight:600;word-break:keep-all}
+.q.quiet{font-size:18px;font-weight:500;color:var(--muted)}
+.bigcard{margin-top:10px;background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:12px;text-align:center;font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}
+.tools-row{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.thbox{background:var(--blue-soft);border-radius:12px;padding:10px 14px;margin:6px 0}
+.mic-wrap{display:flex;flex-direction:column;align-items:center;margin:18px 0 10px}
+.mic{position:relative;width:88px;height:88px;border-radius:50%;border:0;background:var(--blue);color:var(--on-blue);display:grid;place-items:center}
+.mic.on{background:var(--red);color:#fff}
+.mic.on::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:3px solid var(--red);animation:ring 1.2s ease-out infinite}
+@keyframes ring{from{transform:scale(.9);opacity:.6}to{transform:scale(1.25);opacity:0}}
+@media (prefers-reduced-motion: reduce){.mic.on::after{animation:none;opacity:.5}}
+.mic-label{margin-top:10px;color:var(--muted);font-size:14px}
+.live{min-height:3.2em;background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;font-size:18px}
+.alt-row{display:flex;gap:8px;margin:12px 0 4px}
+.input{flex:1;min-width:0;min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 12px}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;min-height:44px;padding:0 4px}
+.btn{min-height:52px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font-weight:700;padding:0 16px}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.good{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.btn.bad{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.btn.block{width:100%}
+.result{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:14px 0 0}
+.result .said{font-size:20px;margin:2px 0 8px}
+.pill{display:inline-block;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:700}
+.pill.good{background:var(--green-soft);color:var(--green)}
+.pill.mid{background:var(--blue-soft);color:var(--blue)}
+.pill.low{background:var(--red-soft);color:var(--red)}
+.model{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.model .ko{font-size:21px;font-weight:600;line-height:1.55}
+.model .th{color:var(--muted);margin:6px 0}
+.rate{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+
+/* summary, setup, vocab */
+h2{font-size:22px;line-height:1.35;margin:8px 0 4px}
+h3{font-size:16px;margin:20px 0 6px}
+.stat{display:flex;gap:10px;margin:12px 0}
+.stat div{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:26px;font-variant-numeric:tabular-nums}
+.logrow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.logrow .dot{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700}
+.logrow .dot.good{background:var(--green-soft);color:var(--green)}
+.logrow .dot.bad{background:var(--red-soft);color:var(--red)}
+.field{display:block;margin:12px 0}
+.field span{display:block;font-weight:600;margin-bottom:4px}
+.field small{display:block;color:var(--muted);font-size:13px;line-height:1.4;margin-top:2px}
+.field .input{width:100%;flex:none}
+.vrow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:6px;min-height:56px}
+.vrow .k{font-size:20px;font-weight:600}
+.vrow .t{color:var(--muted);font-size:15px;text-align:right}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+'use strict';
+
+/* ---------- storage (falls back to memory if the browser blocks it) ---------- */
+const store=(function(){
+  const mem={};let ok=false;
+  try{localStorage.setItem('__eps','1');localStorage.removeItem('__eps');ok=true;}catch(e){}
+  return{
+    persistent:ok,
+    get(k,d){
+      try{if(ok){const v=localStorage.getItem(k);if(v!==null)return JSON.parse(v);}}catch(e){}
+      return Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:d;
+    },
+    set(k,v){mem[k]=v;try{if(ok)localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  };
+})();
+
+/* ---------- Korean numbers ---------- */
+const SD=['','일','이','삼','사','오','육','칠','팔','구'];
+function sino(n){
+  n=Math.floor(n);if(n===0)return'영';
+  const th=Math.floor(n/1000),h=Math.floor(n%1000/100),t=Math.floor(n%100/10),o=n%10;
+  let s='';
+  if(th)s+=(th>1?SD[th]:'')+'천';
+  if(h)s+=(h>1?SD[h]:'')+'백';
+  if(t)s+=(t>1?SD[t]:'')+'십';
+  return s+SD[o];
+}
+const NO=['','한','두','세','네','다섯','여섯','일곱','여덟','아홉'];
+const NT=['','열','스물','서른','마흔','쉰','예순','일흔','여든','아흔'];
+function native(n){
+  if(n<1||n>99)return String(n);
+  if(n===20)return'스무';
+  return NT[Math.floor(n/10)]+NO[n%10];
+}
+function hasBatchim(s){const c=s.charCodeAt(s.length-1)-0xAC00;return c>=0&&c<11172&&c%28!==0;}
+function josa(w,a,b){return w+(hasBatchim(w)?a:b);}
+function monthKo(m){return m===6?'유월':m===10?'시월':sino(m)+'월';}
+
+/* ---------- text similarity (jamo level) ---------- */
+function norm(s){return String(s||'').replace(/[\s.,!?~·'"“”‘’()\/\-–—]/g,'').normalize('NFD');}
+function lev(a,b){
+  const m=a.length,n=b.length;if(!m)return n;if(!n)return m;
+  let prev=new Array(n+1),cur=new Array(n+1);
+  for(let j=0;j<=n;j++)prev[j]=j;
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++){cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));}
+    const t=prev;prev=cur;cur=t;
+  }
+  return prev[n];
+}
+function sim(a,b){a=norm(a);b=norm(b);const L=Math.max(a.length,b.length);return L?1-lev(a,b)/L:1;}
+
+/* ---------- content from the handout ---------- */
+const ACK=['네, 알겠습니다.','예, 알겠습니다.','알겠습니다.'];
+
+const MOTION=[
+ ['왼손을 올리세요 / 왼손을 드세요','왼손을 올리세요','ยกมือซ้ายขึ้น'],
+ ['왼손을 내리세요','왼손을 내리세요','ลดมือซ้ายลง'],
+ ['오른손을 올리세요 / 오른손을 드세요','오른손을 올리세요','ยกมือขวาขึ้น'],
+ ['오른손을 내리세요','오른손을 내리세요','ลดมือขวาลง'],
+ ['양손을 올리세요','양손을 올리세요','ยกมือสองข้างขึ้น'],
+ ['양손을 내리세요','양손을 내리세요','ลดมือสองข้างลง'],
+ ['뒤로 돌아서세요','뒤로 돌아서세요','หันหลังกลับ'],
+ ['앞으로 돌아서세요','앞으로 돌아서세요','หันกลับมาข้างหน้า'],
+ ['뒤로 돌아가세요','뒤로 돌아가세요','ถอยหลังไป'],
+ ['왼쪽으로 가세요','왼쪽으로 가세요','ไปทางซ้าย'],
+ ['오른쪽으로 가세요','오른쪽으로 가세요','ไปทางขวา'],
+ ['멈추세요','멈추세요','หยุด'],
+ ['위를 보세요','위를 보세요','มองขึ้นข้างบน'],
+ ['아래를 보세요','아래를 보세요','มองลงข้างล่าง'],
+ ['앞을 보세요','앞을 보세요','มองตรงไปข้างหน้า'],
+ ['왼쪽을 보세요','왼쪽을 보세요','มองไปทางซ้าย'],
+ ['오른쪽을 보세요','오른쪽을 보세요','มองไปทางขวา'],
+ ['이리 오세요','이리 오세요','มาทางนี้'],
+ ['저리 가세요','저리 가세요','ไปทางโน้น'],
+ ['의자에 앉으세요','의자에 앉으세요','นั่งลงบนเก้าอี้'],
+ ['의자에서 일어나세요','의자에서 일어나세요','ลุกขึ้นจากเก้าอี้']
+];
+
+const TOOLS=[
+ ['플라이어 / 펜치를 가져 와서 철사를 펴는 / 구부리는 행동하세요.','플라이어를 가져와서 철사를 펴는 행동하세요.','เอาคีมมา แล้วทำท่ายืดหรืองอลวดเหล็ก'],
+ ['스패너를 가져 와서 너트를 조이는 행동하세요.','스패너를 가져와서 너트를 조이는 행동하세요.','เอาประแจปากตายมา แล้วทำท่าขันน็อต'],
+ ['버니어캘리퍼스를 가져 와서 나사못의 길이를 재는 행동하세요.','버니어캘리퍼스를 가져와서 나사못의 길이를 재는 행동하세요.','เอาเวอร์เนียร์คาลิปเปอร์มา แล้วทำท่าวัดความยาวของสกรู'],
+ ['육각렌치를 가져 와서 육각볼트를 조이는 행동하세요.','육각렌치를 가져와서 육각볼트를 조이는 행동하세요.','เอาประแจหกเหลี่ยมมา แล้วทำท่าขันโบลต์หกเหลี่ยม'],
+ ['망치를 가져 와서 못을 박는 행동하세요.','망치를 가져와서 못을 박는 행동하세요.','เอาค้อนมา แล้วทำท่าตอกตะปู'],
+ ['드라이버를 가져 와서 나사못을 조이는 행동하세요.','드라이버를 가져와서 나사못을 조이는 행동하세요.','เอาไขควงมา แล้วทำท่าขันสกรู'],
+ ['니퍼를 가져 와서 철사를 자르는 행동하세요.','니퍼를 가져와서 철사를 자르는 행동하세요.','เอาคีมตัดมา แล้วทำท่าตัดลวดเหล็ก'],
+ ['칼 / 가위를 가져 와서 종이를 자르는 행동하세요.','가위를 가져와서 종이를 자르는 행동하세요.','เอามีดหรือกรรไกรมา แล้วทำท่าตัดกระดาษ'],
+ ['전기드릴을 가져 와서 나무판 / 원목을 뚫는 행동하세요.','전기드릴을 가져와서 나무판을 뚫는 행동하세요.','เอาสว่านไฟฟ้ามา แล้วทำท่าเจาะแผ่นไม้หรือไม้ท่อน'],
+ ['톱을 가져 와서 나무판 / 원목을 자르는 행동하세요.','톱을 가져와서 나무판을 자르는 행동하세요.','เอาเลื่อยมา แล้วทำท่าตัดแผ่นไม้หรือไม้ท่อน'],
+ ['줄자를 가져 와서 철사 / 철근의 길이 재는 행동하세요.','줄자를 가져와서 철사의 길이를 재는 행동하세요.','เอาตลับเมตรมา แล้วทำท่าวัดความยาวลวดหรือเหล็กเส้น']
+];
+
+const VOCAB=[
+ ['เครื่องมือ',[['플라이어 / 펜치','คีม'],['스패너','ประแจปากตาย'],['육각렌치','ประแจหกเหลี่ยม'],['버니어캘리퍼스','เวอร์เนียร์คาลิปเปอร์'],['망치','ค้อน'],['드라이버','ไขควง'],['니퍼','คีมตัด'],['칼 / 가위','มีด / กรรไกร'],['전기드릴','สว่านไฟฟ้า'],['톱','เลื่อย'],['줄자','ตลับเมตร']]],
+ ['สิ่งของ',[['육각볼트','โบลต์หกเหลี่ยม'],['못','ตะปู'],['너트','น็อต'],['나사못','สกรู'],['철사','ลวดเหล็ก'],['철근','เหล็กเส้น'],['종이','กระดาษ'],['나무판 / 원목','แผ่นไม้ / ไม้ท่อน'],['길이','ความยาว']]],
+ ['คำกริยา',[['가져 오다','เอามา'],['펴다 / 구부리다','ยืด / งอ'],['조이다','ขัน'],['박다','ตอก'],['자르다','ตัด'],['뚫다','เจาะ'],['재다','วัด'],['행동하세요','ทำท่าทาง / ดำเนินการ']]]
+];
+
+/* interview questions 21-41: [ko, thai question, [answers], thai answer, spoken form (optional)] */
+const ST={
+ 21:['왜 한국에서 일하고 싶습니까?','ทำไมถึงอยากทำงานที่เกาหลี',['가족을 위해서 한국에 가서 돈을 열심히 벌 겁니다.'],'เพื่อครอบครัว จะไปเกาหลีและทำงานหาเงินอย่างขยันขันแข็ง'],
+ 22:['한국에 가게 되면 어떻게 할 겁니까?','ถ้าได้ไปเกาหลีจะทำอย่างไร',['한국에 가게 되면 일을 열심히 하고 돈을 많이 벌 겁니다.'],'ถ้าได้ไปเกาหลีจะทำงานอย่างขยันและหาเงินให้ได้มาก'],
+ 23:['직장 동료가 바쁘면 어떻게 할 겁니까?','ถ้าเพื่อนร่วมงานยุ่งอยู่ จะทำอย่างไร',['자기 책임 지는 일은 빨리 끝내고 직장 동료 일을 도와줄 겁니다.'],'จะทำงานที่รับผิดชอบให้เสร็จเร็ว แล้วช่วยงานเพื่อนร่วมงาน'],
+ 24:['직장 동료와 어떻게 지낼 겁니까?','จะอยู่ร่วมกับเพื่อนร่วมงานอย่างไร',['서로 잘 도와주고 잘 지낼 겁니다.'],'จะช่วยเหลือกันและอยู่ร่วมกันอย่างดี'],
+ 25:['직장(회사)에 일이 많으면 어떻게 할 겁니까?','ถ้าที่ทำงานมีงานเยอะ จะทำอย่างไร',['일을 빨리 하고 더 할 겁니다.'],'จะทำงานให้เร็ว และทำเพิ่มอีก','직장에 일이 많으면 어떻게 할 겁니까?'],
+ 26:['상사가 내 의견에 반대하면 어떻게 할 겁니까?','ถ้าหัวหน้าไม่เห็นด้วยกับความเห็นของฉัน จะทำอย่างไร',['불법하지 않게 상사 의견에 따라 할 겁니다.'],'ถ้าไม่ผิดกฎหมาย จะทำตามความเห็นของหัวหน้า'],
+ 27:['일 하다가 실수하면 어떻게 할 겁니까?','ถ้าทำงานแล้วผิดพลาด จะทำอย่างไร',['상사께 말씀 드리고 앞으로 다시 실수 하지 않게 조심 할 겁니다.'],'จะแจ้งหัวหน้า และระวังไม่ให้ผิดพลาดอีกในอนาคต'],
+ 28:['실수가 너무 많으면 어떻게 할 겁니까?','ถ้าผิดพลาดบ่อยเกินไป จะทำอย่างไร',['상사께 말씀 드리고 앞으로 다시 실수 하지 않게 조심 할 겁니다.'],'จะแจ้งหัวหน้า และระวังไม่ให้ผิดพลาดอีกในอนาคต'],
+ 29:['불량품이 많으면 어떻게 할 겁니까?','ถ้ามีของเสียมาก จะทำอย่างไร',['상사께 말씀 드리고 앞으로 다시 실수 하지 않게 조심 할 겁니다.'],'จะแจ้งหัวหน้า และระวังไม่ให้ผิดพลาดอีกในอนาคต'],
+ 30:['한국에서 사용할 수 있는 기술이나 자격증이 있습니까?','มีทักษะหรือใบรับรองที่ใช้ในเกาหลีได้ไหม',['아닙니다. 없습니다.'],'ไม่ครับ ไม่มี'],
+ 31:['다른 사람보다 잘 할 수 있는 기술이 있습니까?','มีทักษะที่ทำได้ดีกว่าคนอื่นไหม',['아닙니다. 없습니다.'],'ไม่ครับ ไม่มี'],
+ 32:['압력을 받고 일할 수 있습니까?','ทำงานภายใต้ความกดดันได้ไหม',['네. 할 수 있습니다.'],'ได้ครับ ทำได้'],
+ 33:['직장 동료와 싸우면 어떻게 할 겁니까?','ถ้าทะเลาะกับเพื่อนร่วมงาน จะทำอย่างไร',['상사께 말씀 드리고 서로 친하게 노력할 겁니다.'],'จะแจ้งหัวหน้า และพยายามทำให้เข้ากันได้'],
+ 34:['상사에게 질책을 받으면 어떻게 할 겁니까?','ถ้าถูกหัวหน้าตำหนิ จะทำอย่างไร',['상사 말씀을 잘 듣고 잘 못 한 거 고칠 겁니다.'],'จะฟังที่หัวหน้าพูดให้ดี แล้วแก้ไขสิ่งที่ทำผิด'],
+ 35:['다른 사람들과 잘 지내는 것이 왜 중요하다고 생각하세요?','ทำไมคิดว่าการเข้ากับคนอื่นได้ดีจึงสำคัญ',['함께 일할 때 더 좋기 때문입니다.'],'เพราะเวลาทำงานด้วยกันจะดีกว่า'],
+ 36:['새로운 동료들과 잘 지내기 위해 어떤 노력을 할 수 있나요?','จะพยายามอย่างไรเพื่อเข้ากับเพื่อนร่วมงานใหม่',['먼저 인사하고 잘 들어주겠습니다.'],'จะทักทายก่อน และตั้งใจรับฟัง'],
+ 37:['문제가 생기면 해결책을 찾기 위해 어떻게 노력하실 겁니까?','ถ้ามีปัญหา จะพยายามหาทางแก้ไขอย่างไร',['생각하고, 다른 사람에게 물어보겠습니다.'],'จะคิดดูก่อน แล้วถามคนอื่น'],
+ 38:['의사소통을 방해하는 요소들은 무엇이 있나요?','อะไรบ้างที่ขัดขวางการสื่อสาร',['화를 내거나 무시하면 힘듭니다.'],'การโกรธหรือเมินเฉยทำให้ลำบาก'],
+ 39:['의사소통이 왜 중요한 지 설명할 수 있나요?','อธิบายได้ไหมว่าทำไมการสื่อสารจึงสำคัญ',['서로 잘 알기 위해서입니다.'],'เพื่อให้เข้าใจกันและกัน'],
+ 40:['사람들 사이에서 지켜야 할 예절에 대해 잘 알고 있나요?','รู้เรื่องมารยาทที่ต้องปฏิบัติระหว่างคนด้วยกันไหม',['인사하고 높임말을 씁니다.'],'ทักทายและใช้คำพูดสุภาพ (높임말)'],
+ 41:['일하면서 정해진 시간을 잘 지키시나요?','ทำงานแล้วรักษาเวลาที่กำหนดได้ดีไหม',['네, 시간 잘 지키는 편입니다.','네, 시간 잘 지킵니다.'],'ครับ รักษาเวลาได้ดี']
+};
+
+const DAYS=['일','월','화','수','목','금','토'];
+const TH_DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const TH_MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+/* ---------- state ---------- */
+const DEF_P={name:'',age:'',country:'태국',months:'3',birthY:'',birthM:'',birthD:'',married:'no',kids:'no',family:'',siblings:'',height:'',weight:'',hometown:'',home:''};
+const REQ=['name','age','country','months','birthY','birthM','birthD','family','siblings','height','weight','hometown','home'];
+let P=Object.assign({},DEF_P,store.get('eps_profile',{}));
+let SET=Object.assign({slow:true,hideKo:false,shuffle:false},store.get('eps_settings',{}));
+let passed=store.get('eps_passed',{});
+let wrong=store.get('eps_wrong',{});
+let view='home',sess=null,ui={},mic=null,voiceKo=null;
+
+const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+const $app=document.getElementById('app');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const v=k=>String(P[k]==null?'':P[k]).trim();
+const num=k=>{const n=parseInt(v(k),10);return isNaN(n)?null:n;};
+const rand=n=>Math.floor(Math.random()*n);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rand(i+1);const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function range(a,b){const r=[];for(let i=a;i<=b;i++)r.push(i);return r;}
+
+/* ---------- speech out ---------- */
+function pickVoice(){
+  try{
+    const vs=speechSynthesis.getVoices();
+    voiceKo=vs.find(x=>/^ko/i.test(String(x.lang).replace('_','-')))||null;
+  }catch(e){}
+}
+if('speechSynthesis' in window){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}}
+function cancelSpeak(){try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}}
+function speak(text){
+  if(!('speechSynthesis' in window))return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='ko-KR';if(voiceKo)u.voice=voiceKo;
+    u.rate=SET.slow?0.78:1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- build question items ---------- */
+function intro(words){
+  const a=num('age'),f=num('family'),m=num('months');
+  const age=a==null?'○○ 살':(words?native(a)+' 살':a+'살');
+  const fam=f==null?'○○ 명':(words?native(f)+' 명':f+'명');
+  const mon=m==null?'○○개월':(words?sino(m):m)+'개월';
+  return '안녕하십니까? 제 이름은 '+(v('name')||'○○')+'입니다. 제 나이는 '+age+'입니다. 저는 '+(v('country')||'○○')+' 사람입니다. 한국어를 배운 지 '+mon+' 됐습니다. '+(v('hometown')||'○○')+'에서 왔습니다. 제 가족은 '+fam+'이 있습니다. 저는 건강하고 책임감이 높고 모든 것이 빨리 배울 수 있는 사람입니다. 한국에 일하러 갈 기회가 있으면 열심히 일을 할 겁니다. 앞으로 잘 부탁드립니다. 만나서 반갑습니다. 감사합니다.';
+}
+
+function interview(n){
+  const id='q'+n;
+  const mk=(ko,say,th,ans,ansTh,o)=>{
+    o=o||{};
+    return{id:id,deck:'interview',n:n,ko:ko,say:say,th:th,answers:o.missing?[]:ans,ansKo:ans[0],ansTh:ansTh,missing:!!o.missing,big:o.big||null,long:!!o.long};
+  };
+  const nm=v('name')||'○○';
+  const day=off=>{const d=new Date();d.setDate(d.getDate()+off);return d;};
+  switch(n){
+    case 0:{
+      const miss=!v('name')||num('age')==null||num('family')==null||num('months')==null||!v('hometown')||!v('country');
+      return mk('자기소개를 해 주세요.','자기소개를 해 주세요.','แนะนำตัวเอง',[intro(true),intro(false)],
+        'สวัสดีครับ ผมชื่อ '+(v('name')||'○○')+' อายุ '+(v('age')||'○○')+' ปี เป็นคน'+(v('country')==='태국'?'ไทย':(v('country')||'○○'))+' เรียนภาษาเกาหลีมา '+(v('months')||'○○')+' เดือน มาจาก '+(v('hometown')||'○○')+' ครอบครัวมี '+(v('family')||'○○')+' คน ผมเป็นคนแข็งแรง รับผิดชอบสูง และเรียนรู้ทุกอย่างได้เร็ว ถ้ามีโอกาสไปทำงานที่เกาหลีจะทำงานอย่างขยันขันแข็ง ฝากตัวด้วยครับ ยินดีที่ได้พบ ขอบคุณครับ',
+        {missing:miss,long:true});
+    }
+    case 1:
+      return mk('성함이 어떻게 되세요? / 이름이 무엇입니까?','성함이 어떻게 되세요?','ชื่ออะไร (ชื่อของคุณคืออะไร)',
+        ['제 이름이 '+nm+'입니다.','제 이름은 '+nm+'입니다.'],'ผมชื่อ '+(v('name')||'○○'),{missing:!v('name')});
+    case 2:{
+      const a=num('age');
+      return mk('나이가 몇 살입니까?','나이가 몇 살입니까?','อายุเท่าไร',
+        a==null?['제 나이가 ○○살입니다.']:['제 나이가 '+native(a)+' 살입니다.','제 나이가 '+a+'살입니다.'],
+        'ผมอายุ '+(a==null?'○○':a)+' ปี',{missing:a==null});
+    }
+    case 3:{
+      const Y=num('birthY'),M=num('birthM'),D=num('birthD');
+      const bad=Y==null||M==null||D==null||M<1||M>12||D<1||D>31||Y<1900||Y>2100;
+      return mk('생일이 언제입니까?','생일이 언제입니까?','วันเกิดคือเมื่อไร',
+        bad?['제 생일이 ○○○○년 ○월 ○일입니다.']:['제 생일이 '+sino(Y)+'년 '+monthKo(M)+' '+sino(D)+'일입니다.','제 생일이 '+Y+'년 '+M+'월 '+D+'일입니다.'],
+        'วันเกิดของผมคือวันที่ '+(bad?'○':D)+' '+(bad?'○○':TH_MONTHS[M-1])+' '+(bad?'○○○○':Y),{missing:bad});
+    }
+    case 4:{
+      const yes=v('married')==='yes';
+      return mk('결혼했습니까?','결혼했습니까?','แต่งงานแล้วหรือยัง',
+        yes?['네, 결혼했습니다.']:['아닙니다, 아직 결혼 안 했습니다.','아니요, 아직 결혼 안 했습니다.'],
+        yes?'ครับ แต่งงานแล้ว':'ไม่ครับ ยังไม่ได้แต่งงาน');
+    }
+    case 5:{
+      const yes=v('kids')==='yes';
+      return mk('아이가 있습니까?','아이가 있습니까?','มีลูกไหม',
+        yes?['네, 있습니다.']:['아닙니다, 없습니다.','아니요, 없습니다.'],
+        yes?'ครับ มีลูกแล้ว':'ไม่ครับ ยังไม่มี');
+    }
+    case 6:{
+      const f=num('family');
+      return mk('가족이 몇 명입니까?','가족이 몇 명입니까?','ครอบครัวมีกี่คน',
+        f==null?['제 가족이 ○○명입니다.']:['제 가족이 '+native(f)+' 명입니다.','제 가족이 '+f+'명입니다.'],
+        'ครอบครัวของผมมี '+(f==null?'○○':f)+' คน',{missing:f==null});
+    }
+    case 7:{
+      const s=num('siblings');
+      if(s===0)return mk('형제가 몇 명입니까?','형제가 몇 명입니까?','มีพี่น้องกี่คน',['제 형제가 없습니다.','저는 형제가 없습니다.'],'ผมไม่มีพี่น้อง');
+      return mk('형제가 몇 명입니까?','형제가 몇 명입니까?','มีพี่น้องกี่คน',
+        s==null?['제 형제가 ○○명입니다.']:['제 형제가 '+native(s)+' 명입니다.','제 형제가 '+s+'명입니다.'],
+        'ผมมีพี่น้อง '+(s==null?'○○':s)+' คน',{missing:s==null});
+    }
+    case 8:{
+      const h=num('height');
+      return mk('키가 몇 센티미터입니까?','키가 몇 센티미터입니까?','สูงกี่เซนติเมตร',
+        h==null?['제 키가 ○○센티미터입니다.']:['제 키가 '+sino(h)+' 센티미터입니다.','제 키가 '+h+' 센티미터입니다.'],
+        'ผมสูง '+(h==null?'○○':h)+' เซนติเมตร',{missing:h==null});
+    }
+    case 9:{
+      const w=num('weight');
+      return mk('몸무게가 몇 킬로그램입니까?','몸무게가 몇 킬로그램입니까?','น้ำหนักกี่กิโลกรัม',
+        w==null?['제 몸무게가 ○○킬로그램입니다.']:['제 몸무게가 '+sino(w)+' 킬로그램입니다.','제 몸무게가 '+w+' 킬로그램입니다.'],
+        'ผมหนัก '+(w==null?'○○':w)+' กิโลกรัม',{missing:w==null});
+    }
+    case 10:{
+      const T=new Date(),h=T.getHours()%12||12,mi=T.getMinutes();
+      const full=mi?['지금 '+native(h)+' 시 '+sino(mi)+' 분입니다.','지금 '+h+'시 '+mi+'분입니다.']:['지금 '+native(h)+' 시입니다.','지금 '+h+'시입니다.'];
+      const hourOnly=mi?['지금 '+native(h)+' 시입니다.','지금 '+h+'시입니다.']:[];
+      return mk('지금 몇 시입니까?','지금 몇 시입니까?','ตอนนี้กี่โมง',full.concat(hourOnly),
+        'ตอนนี้ '+h+' นาฬิกา'+(mi?' '+mi+' นาที':''));
+    }
+    case 11:case 12:case 13:{
+      const off=n===11?0:n===12?1:-1,w=n===11?'오늘은':n===12?'내일은':'어제는',tw=n===11?'วันนี้':n===12?'พรุ่งนี้':'เมื่อวาน';
+      const d=day(off).getDay();
+      return mk(w+' 무슨 요일입니까?',w+' 무슨 요일입니까?',tw+'วันอะไร',[w+' '+DAYS[d]+'요일입니다.'],tw+'วัน'+TH_DAYS[d]);
+    }
+    case 14:case 15:case 16:{
+      const off=n===14?0:n===15?1:-1,w=n===14?'오늘은':n===15?'내일은':'어제는',tw=n===14?'วันนี้':n===15?'พรุ่งนี้':'เมื่อวาน';
+      const d=day(off),m=d.getMonth()+1,dd=d.getDate();
+      return mk(w+' 몇 월 며칠입니까?',w+' 몇 월 며칠입니까?',tw+'วันที่เท่าไร เดือนอะไร',
+        [w+' '+monthKo(m)+' '+sino(dd)+'일입니다.',w+' '+m+'월 '+dd+'일입니다.'],tw+'วันที่ '+dd+' '+TH_MONTHS[m-1]);
+    }
+    case 17:{
+      const x=1+rand(100);
+      return mk('숫자가 얼마입니까?','숫자가 얼마입니까?','ตัวเลขนี้คือเท่าไร',['숫자가 '+sino(x)+'입니다.','숫자가 '+x+'입니다.'],'ตัวเลขคือ '+x,{big:String(x)});
+    }
+    case 18:{
+      const ops=[{w:'더하기',s:'+'},{w:'빼기',s:'−'},{w:'곱하기',s:'×'},{w:'나누기',s:'÷'}];
+      const op=ops[rand(4)];let a,b,r;
+      if(op.s==='+'){a=1+rand(20);b=1+rand(20);r=a+b;}
+      else if(op.s==='−'){a=5+rand(26);b=1+rand(a-1);r=a-b;}
+      else if(op.s==='×'){a=2+rand(8);b=2+rand(8);r=a*b;}
+      else{b=2+rand(8);r=2+rand(8);a=b*r;}
+      const q=sino(a)+' '+op.w+' '+josa(sino(b),'은','는')+' 얼마입니까?';
+      return mk(q,q,'ช่วยคำนวณตัวเลขต่อไปนี้',[sino(r)+'입니다.',r+'입니다.'],'คำตอบคือ '+r,{big:a+' '+op.s+' '+b+' = ?'});
+    }
+    case 19:
+      return mk('어디에서 왔습니까?','어디에서 왔습니까?','มาจากที่ไหน',[(v('hometown')||'○○')+'에서 왔습니다.'],'ผมมาจาก '+(v('hometown')||'○○'),{missing:!v('hometown')});
+    case 20:
+      return mk('어디에서 삽니까?','어디에서 삽니까?','อาศัยอยู่ที่ไหน',[(v('home')||'○○')+'에서 삽니다.'],'ผมอาศัยอยู่ที่ '+(v('home')||'○○'),{missing:!v('home')});
+    default:{
+      const s=ST[n];
+      return mk(s[0],s[4]||s[0],s[1],s[2],s[3]);
+    }
+  }
+}
+
+function build(ref){
+  if(ref.deck==='motion'){
+    const d=MOTION[ref.n-1];
+    return{id:'m'+ref.n,deck:'motion',n:ref.n,ko:d[0],say:d[1],th:d[2],answers:ACK,ansKo:'네, 알겠습니다.',ansTh:'ครับ เข้าใจแล้ว — แล้วทำท่า: '+d[2],big:null,long:false};
+  }
+  if(ref.deck==='tools'){
+    const d=TOOLS[ref.n-1];
+    return{id:'t'+ref.n,deck:'tools',n:ref.n,ko:d[0],say:d[1],th:d[2],answers:ACK,ansKo:'네, 알겠습니다.',ansTh:'ครับ เข้าใจแล้ว — แล้วทำท่า: '+d[2],big:null,long:false};
+  }
+  return interview(ref.n);
+}
+
+/* ---------- sessions ---------- */
+function refFromId(id){
+  const n=parseInt(id.slice(1),10);
+  return{deck:id[0]==='m'?'motion':id[0]==='t'?'tools':'interview',n:n};
+}
+function startSession(kind){
+  let list=[],title='',exam=false;
+  const M=n=>({deck:'motion',n:n}),T=n=>({deck:'tools',n:n}),Q=n=>({deck:'interview',n:n});
+  if(kind==='motion'){list=range(1,21).map(M);title='คำสั่งขยับตัว';}
+  else if(kind==='tools'){list=range(1,11).map(T);title='เครื่องมือ';}
+  else if(kind==='interview'){list=range(0,41).map(Q);title='สัมภาษณ์';}
+  else if(kind==='mix'){
+    exam=true;title='ซ้อมสอบผสม';
+    const rest=shuffle(shuffle(range(1,21)).slice(0,3).map(M).concat(shuffle(range(1,11)).slice(0,2).map(T),shuffle(range(1,41)).slice(0,8).map(Q)));
+    list=[Q(0)].concat(rest);
+  }
+  else if(kind==='review'){
+    list=Object.keys(wrong).map(refFromId);title='ข้อที่ต้องซ้อมอีก';
+  }
+  if(!list.length)return;
+  if(SET.shuffle&&!exam)shuffle(list);
+  sess={kind:kind,title:title,list:list,i:0,exam:exam,started:Date.now(),log:[],cur:null};
+  present();
+}
+function present(){
+  stopMic(true);
+  sess.cur=build(sess.list[sess.i]);
+  ui={phase:'ask',showTh:false,peek:false,msg:'',res:null};
+  view='session';render();window.scrollTo(0,0);
+  speak(sess.cur.say);
+}
+function finish(){stopMic(true);cancelSpeak();view='summary';render();window.scrollTo(0,0);}
+function saveProgress(){store.set('eps_passed',passed);store.set('eps_wrong',wrong);}
+
+/* ---------- speech in ---------- */
+function stopMic(abort){
+  if(mic&&mic.rec){try{mic.rec.onend=null;mic.rec.onerror=null;mic.rec.onresult=null;if(abort)mic.rec.abort();else mic.rec.stop();}catch(e){}}
+  mic=null;
+}
+function updateLive(){
+  const el=document.getElementById('live');
+  if(el&&mic)el.textContent=(mic.final+' '+mic.interim).trim();
+}
+function startMic(){
+  cancelSpeak();
+  if(!SRC){ui.msg='เบราว์เซอร์นี้ยังไม่รองรับการฟังเสียง ลองใช้ Chrome หรือ Safari เวอร์ชันล่าสุด หรือพิมพ์คำตอบแทน';render();return;}
+  const r=new SRC();
+  r.lang='ko-KR';r.interimResults=true;r.continuous=!!sess.cur.long;r.maxAlternatives=1;
+  const m={on:true,rec:r,final:'',interim:'',err:''};
+  mic=m;
+  r.onresult=ev=>{
+    let f='',i='';
+    for(let k=0;k<ev.results.length;k++){const x=ev.results[k];if(x.isFinal)f+=x[0].transcript+' ';else i+=x[0].transcript;}
+    m.final=f.trim();m.interim=i;updateLive();
+  };
+  r.onerror=ev=>{m.err=ev.error||'error';};
+  r.onend=()=>{m.on=false;if(mic===m)afterMic(m);};
+  try{r.start();ui.msg='';}catch(e){m.on=false;mic=null;ui.msg='เริ่มไมค์ไม่ได้ ลองแตะอีกครั้ง';}
+  render();
+}
+function afterMic(m){
+  const text=(m.final+' '+m.interim).trim();
+  mic=null;
+  if(m.err==='not-allowed'||m.err==='service-not-allowed'){
+    ui.msg='ไมค์ถูกบล็อก — อนุญาตให้เบราว์เซอร์ใช้ไมค์ หรือเปิดไฟล์นอกหน้าพรีวิว ตอนนี้พิมพ์คำตอบแทนได้';render();return;
+  }
+  if(!text){
+    ui.msg=(!m.err||m.err==='no-speech')?'ไม่ได้ยินเสียง ลองแตะไมค์แล้วพูดอีกครั้ง':'ไมค์ผิดพลาด ('+m.err+') ลองอีกครั้งหรือพิมพ์คำตอบ';
+    render();return;
+  }
+  answer(text);
+}
+function answer(text){
+  const it=sess.cur;let score=null,ack=null;
+  if(it.deck==='interview'){
+    if(it.answers.length){score=0;it.answers.forEach(a=>{score=Math.max(score,sim(a,text));});}
+  }else{
+    score=Math.max.apply(null,ACK.map(a=>sim(a,text)));
+    ack=score>=0.6||/알겠/.test(text);
+  }
+  ui.phase='answered';ui.res={text:text,score:score,ack:ack};ui.msg='';
+  render();
+}
+
+/* ---------- views ---------- */
+const I={
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  spk:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>',
+  mic:'<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>',
+  stop:'<svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>'
+};
+
+function render(){
+  if(view==='home')$app.innerHTML=renderHome();
+  else if(view==='session')$app.innerHTML=renderSession();
+  else if(view==='summary')$app.innerHTML=renderSummary();
+  else if(view==='setup')$app.innerHTML=renderSetup();
+  else if(view==='vocab')$app.innerHTML=renderVocab();
+  updateLive();
+}
+
+function countPassed(p,total){
+  let c=0;Object.keys(passed).forEach(k=>{if(k[0]===p)c++;});
+  return{c:Math.min(c,total),total:total};
+}
+function deckRow(k,glyph,name,meta,pr){
+  const bar=pr?'<div class="track"><i style="width:'+Math.round(pr.c/pr.total*100)+'%"></i></div>':'';
+  return '<button class="deck" data-a="start" data-k="'+k+'"><div class="emblem" aria-hidden="true">'+glyph+'</div><div class="deck-main"><div class="deck-name">'+name+'</div><div class="deck-meta">'+meta+(pr?' · ผ่านแล้ว '+pr.c+'/'+pr.total:'')+'</div>'+bar+'</div></button>';
+}
+function renderHome(){
+  const miss=REQ.filter(k=>!v(k)).length;
+  const wn=Object.keys(wrong).length;
+  let h='<h1 class="home-title">ซ้อมสอบทักษะ EPS</h1><p class="home-sub">ฟังคำถามภาษาเกาหลี แล้วตอบด้วยเสียงของคุณเอง</p>';
+  if(!SRC)h+='<div class="note">เบราว์เซอร์นี้ไม่รองรับการฟังเสียง ลองใช้ Chrome หรือ Safari เวอร์ชันล่าสุด ตอนนี้ยังตอบด้วยการพิมพ์ได้</div>';
+  if(miss)h+='<div class="note calm">ยังไม่ได้กรอกข้อมูลของฉัน '+miss+' ช่อง (ชื่อ อายุ วันเกิด ฯลฯ) — กรอกก่อนเพื่อให้ตรวจคำตอบข้อแนะนำตัวได้ตรง</div>';
+  h+='<div class="seg" role="group" aria-label="ลำดับข้อ"><button data-a="order" data-v="0" aria-pressed="'+(!SET.shuffle)+'">เรียงตามชีท</button><button data-a="order" data-v="1" aria-pressed="'+SET.shuffle+'">สุ่มข้อ</button></div>';
+  h+=deckRow('motion','손','คำสั่งขยับตัว','21 ข้อ',countPassed('m',21));
+  h+=deckRow('tools','못','เครื่องมือ','11 ข้อ',countPassed('t',11));
+  h+=deckRow('interview','말','สัมภาษณ์','แนะนำตัว + 41 ข้อ',countPassed('q',42));
+  h+=deckRow('mix','실','ซ้อมสอบผสม','14 ข้อ สุ่ม ซ่อนข้อความเกาหลี',null);
+  h+='<div class="links">';
+  if(wn)h+='<button class="chip" data-a="start" data-k="review">ข้อที่ต้องซ้อมอีก ('+wn+')</button>';
+  h+='<button class="chip" data-a="vocab">คำศัพท์เครื่องมือ</button><button class="chip" data-a="setup">ข้อมูลของฉัน</button></div>';
+  h+='<h3>ตัวเลือก</h3><div class="links"><button class="chip" data-a="opt" data-k="slow" aria-pressed="'+SET.slow+'">พูดช้าลง</button><button class="chip" data-a="opt" data-k="hideKo" aria-pressed="'+SET.hideKo+'">ซ่อนตัวอักษรเกาหลี (ฟังอย่างเดียว)</button></div>';
+  if(!store.persistent)h+='<p class="small">หน้าตัวอย่างนี้ยังบันทึกความคืบหน้าข้ามการเปิดแอปไม่ได้ จะบันทึกได้เมื่อนำไปวางบนเว็บ</p>';
+  return h;
+}
+
+function renderSession(){
+  const it=sess.cur,total=sess.list.length;
+  const hidden=(SET.hideKo||sess.exam)&&!ui.peek&&ui.phase==='ask';
+  const task=it.deck==='interview'?'ฟังคำถาม แล้วตอบเป็นภาษาเกาหลี':it.deck==='motion'?'ฟังคำสั่ง ทำท่าตาม แล้วพูดว่า 네, 알겠습니다':'ฟังคำสั่ง ทำท่าใช้เครื่องมือ แล้วพูดว่า 네, 알겠습니다';
+  let h='<div class="top"><button class="icon-btn" data-a="home" aria-label="กลับหน้าแรก">'+I.back+'</button><div class="top-title">'+esc(sess.title)+'</div><div class="top-count">'+(sess.i+1)+'/'+total+'</div></div>';
+  h+='<div class="prog"><i style="width:'+Math.round(sess.i/total*100)+'%"></i></div>';
+  h+='<p class="task">'+task+'</p>';
+  h+=hidden?'<div class="q quiet">ฟังแล้วตอบ (ตัวอักษรถูกซ่อนไว้)</div>':'<div class="q">'+esc(it.ko)+'</div>';
+  if(it.big)h+='<div class="bigcard" aria-label="ตัวเลขที่ผู้สอบถือให้ดู">'+esc(it.big)+'</div>';
+  h+='<div class="tools-row"><button class="chip" data-a="replay">'+I.spk+' ฟังอีกครั้ง</button><button class="chip" data-a="slow" aria-pressed="'+SET.slow+'">พูดช้า</button>';
+  if(hidden)h+='<button class="chip" data-a="peek">ดูตัวอักษร</button>';
+  if(ui.phase==='ask'&&!sess.exam&&!ui.showTh)h+='<button class="chip" data-a="showth">ดูความหมาย</button>';
+  h+='</div>';
+  if(ui.showTh&&ui.phase==='ask')h+='<div class="thbox">'+esc(it.th)+'</div>';
+
+  if(ui.phase==='ask'){
+    const on=mic&&mic.on;
+    const live=mic?(mic.final+' '+mic.interim).trim():'';
+    h+='<div class="mic-wrap"><button class="mic'+(on?' on':'')+'" data-a="mic" aria-label="'+(on?'หยุดฟัง':'เริ่มพูด')+'">'+(on?I.stop:I.mic)+'</button><div class="mic-label">'+(on?'กำลังฟัง… แตะเพื่อหยุด':'แตะเพื่อพูดตอบ')+'</div></div>';
+    h+='<div class="live" id="live" aria-live="polite">'+esc(live)+'</div>';
+    if(ui.msg)h+='<div class="note">'+esc(ui.msg)+'</div>';
+    if(it.deck==='interview'){
+      h+='<div class="alt-row"><input class="input" id="typed" placeholder="หรือพิมพ์คำตอบเป็นฮันกึล" autocomplete="off" autocapitalize="off"><button class="btn" data-a="typed">ส่ง</button></div>';
+    }else{
+      h+='<div class="alt-row"><button class="btn block" data-a="done">พูดและทำท่าแล้ว (ไม่ใช้ไมค์)</button></div>';
+    }
+    h+='<button class="linkbtn" data-a="skip">ยังตอบไม่ได้ ดูเฉลย</button>';
+  }else{
+    const r=ui.res;
+    if(r){
+      let pill='';
+      if(it.deck==='interview'){
+        if(r.score==null)pill='<span class="pill mid">ยังตรวจอัตโนมัติไม่ได้ — กรอกข้อมูลของฉันก่อน</span>';
+        else{
+          const hi=it.long?0.75:0.85,mid=it.long?0.5:0.6,p=Math.round(r.score*100);
+          pill=r.score>=hi?'<span class="pill good">ตรงกับตัวอย่าง '+p+'%</span>':r.score>=mid?'<span class="pill mid">ใกล้เคียง '+p+'%</span>':'<span class="pill low">ยังต่างจากตัวอย่าง '+p+'%</span>';
+        }
+      }else{
+        pill=r.ack?'<span class="pill good">ได้ยินคำว่า 알겠습니다</span>':'<span class="pill low">ไม่ได้ยินคำว่า 알겠습니다</span>';
+      }
+      h+='<div class="result"><div class="small">คุณพูดว่า</div><div class="said">'+esc(r.text)+'</div>'+pill+'</div>';
+    }
+    h+='<div class="model"><div class="ko">'+esc(it.ansKo)+'</div><div class="th">'+esc(it.ansTh)+'</div><div class="th">คำถามหมายถึง: '+esc(it.th)+'</div><button class="chip" data-a="hear">'+I.spk+' ฟังตัวอย่าง</button>';
+    if(it.missing)h+='<div class="note calm" style="margin-top:10px">ตัวอย่างนี้ใช้ข้อมูลของคุณ ใส่ข้อมูลในหน้า “ข้อมูลของฉัน” แล้วจะตรงกับคุณ</div>';
+    h+='</div>';
+    h+='<div class="rate"><button class="btn bad" data-a="rate" data-v="0">ต้องซ้อมอีก</button><button class="btn good" data-a="rate" data-v="1">ตอบได้แล้ว</button></div>';
+  }
+  return h;
+}
+
+function renderSummary(){
+  const secs=Math.round((Date.now()-sess.started)/1000),mm=Math.floor(secs/60),ss=String(secs%60).padStart(2,'0');
+  const good=sess.log.filter(x=>x.good).length,bad=sess.log.length-good;
+  let h='<h2>เสร็จแล้ว</h2><p class="home-sub">'+esc(sess.title)+'</p>';
+  h+='<div class="stat"><div><b>'+good+'</b>ตอบได้</div><div><b>'+bad+'</b>ต้องซ้อมอีก</div><div><b>'+mm+':'+ss+'</b>เวลารวม</div></div>';
+  h+='<div>';
+  sess.log.slice().sort((a,b)=>a.good-b.good).forEach(x=>{
+    h+='<div class="logrow"><span class="dot '+(x.good?'good':'bad')+'" aria-label="'+(x.good?'ตอบได้':'ต้องซ้อมอีก')+'">'+(x.good?'✓':'!')+'</span><div>'+esc(x.ko)+'</div></div>';
+  });
+  h+='</div><div style="display:grid;gap:10px;margin-top:18px">';
+  if(Object.keys(wrong).length)h+='<button class="btn primary" data-a="start" data-k="review">ซ้อมเฉพาะข้อที่ต้องซ้อมอีก</button>';
+  h+='<button class="btn" data-a="home">กลับหน้าแรก</button></div>';
+  return h;
+}
+
+function renderSetup(){
+  const F=(k,label,hint,mode)=>'<label class="field"><span>'+label+'</span><input class="input" data-f="'+k+'" value="'+esc(P[k])+'" autocomplete="off"'+(mode==='n'?' inputmode="numeric"':'')+'>'+(hint?'<small>'+hint+'</small>':'')+'</label>';
+  const S=(k,label,opts)=>'<label class="field"><span>'+label+'</span><select class="input" data-f="'+k+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(P[k]===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>';
+  let h='<div class="top"><button class="icon-btn" data-a="home" aria-label="กลับหน้าแรก">'+I.back+'</button><div class="top-title">ข้อมูลของฉัน</div></div>';
+  h+='<p class="small">ใช้เติมคำตอบตัวอย่างข้อแนะนำตัวและข้อ 1-9, 19-20 ข้อมูลจะอยู่ในเครื่องของคุณเท่านั้น</p>';
+  h+=F('name','ชื่อ (ฮันกึล)','เช่น 알렉스 — ถ้ายังพิมพ์ฮันกึลไม่ได้ ให้ถามผมในแชทแล้วผมจะเขียนให้');
+  h+=F('age','อายุ (ปี)','','n');
+  h+=F('country','สัญชาติ (ฮันกึล)','เช่น 태국 (ไทย) 라오스 (ลาว)');
+  h+=F('months','เรียนภาษาเกาหลีมากี่เดือน','','n');
+  h+=F('birthY','ปีเกิด (ค.ศ.)','เช่น 1998','n');
+  h+=F('birthM','เดือนเกิด (1-12)','','n');
+  h+=F('birthD','วันที่เกิด (1-31)','','n');
+  h+=S('married','แต่งงานแล้วหรือยัง',[['no','ยังไม่ได้แต่งงาน'],['yes','แต่งงานแล้ว']]);
+  h+=S('kids','มีลูกไหม',[['no','ไม่มี'],['yes','มี']]);
+  h+=F('family','สมาชิกในครอบครัว (คน)','','n');
+  h+=F('siblings','จำนวนพี่น้อง (คน)','','n');
+  h+=F('height','ส่วนสูง (ซม.)','','n');
+  h+=F('weight','น้ำหนัก (กก.)','','n');
+  h+=F('hometown','มาจากที่ไหน (ฮันกึล)','เช่น ชื่อจังหวัดหรืออำเภอเป็นอักษรเกาหลี');
+  h+=F('home','อาศัยอยู่ที่ไหน (ฮันกึล)','');
+  h+='<button class="btn primary block" data-a="home" style="margin-top:12px">บันทึกและกลับ</button>';
+  return h;
+}
+
+function renderVocab(){
+  let h='<div class="top"><button class="icon-btn" data-a="home" aria-label="กลับหน้าแรก">'+I.back+'</button><div class="top-title">คำศัพท์เครื่องมือ</div></div><p class="small">แตะแถวไหนก็ได้เพื่อฟังเสียงอ่าน</p>';
+  VOCAB.forEach(g=>{
+    h+='<h3>'+g[0]+'</h3>';
+    g[1].forEach(r=>{h+='<button class="vrow" data-a="say" data-t="'+esc(r[0].split(' / ')[0])+'"><span class="k">'+esc(r[0])+'</span><span class="t">'+esc(r[1])+'</span></button>';});
+  });
+  return h;
+}
+
+/* ---------- events ---------- */
+const A={
+  start:t=>startSession(t.dataset.k),
+  home:()=>{stopMic(true);cancelSpeak();view='home';render();window.scrollTo(0,0);},
+  setup:()=>{view='setup';render();window.scrollTo(0,0);},
+  vocab:()=>{view='vocab';render();window.scrollTo(0,0);},
+  say:t=>speak(t.dataset.t),
+  order:t=>{SET.shuffle=t.dataset.v==='1';store.set('eps_settings',SET);render();},
+  opt:t=>{const k=t.dataset.k;SET[k]=!SET[k];store.set('eps_settings',SET);render();},
+  slow:()=>{SET.slow=!SET.slow;store.set('eps_settings',SET);render();},
+  replay:()=>{if(mic&&mic.on)return;speak(sess.cur.say);},
+  hear:()=>speak(sess.cur.ansKo),
+  peek:()=>{ui.peek=true;render();},
+  showth:()=>{ui.showTh=true;render();},
+  mic:()=>{if(mic&&mic.on){try{mic.rec.stop();}catch(e){}return;}startMic();},
+  typed:()=>{const el=document.getElementById('typed');const t=el?el.value.trim():'';if(!t){ui.msg='พิมพ์คำตอบก่อนแล้วกดส่ง';render();return;}stopMic(true);cancelSpeak();answer(t);},
+  done:()=>{stopMic(true);cancelSpeak();answer('(ทำท่าตามคำสั่งแล้ว)');ui.res={text:'(ทำท่าตามคำสั่งแล้ว ไม่ได้ใช้ไมค์)',score:null,ack:null};render();},
+  skip:()=>{stopMic(true);cancelSpeak();ui.phase='answered';ui.res=null;ui.msg='';render();},
+  rate:t=>{
+    const good=t.dataset.v==='1',it=sess.cur;
+    sess.log.push({id:it.id,ko:it.ko,good:good});
+    if(good){passed[it.id]=1;delete wrong[it.id];}else{wrong[it.id]=1;delete passed[it.id];}
+    saveProgress();cancelSpeak();
+    if(sess.i+1>=sess.list.length)finish();else{sess.i++;present();}
+  }
+};
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');
+  if(!t)return;
+  const f=A[t.dataset.a];
+  if(f)f(t);
+});
+document.addEventListener('input',e=>{
+  const f=e.target&&e.target.dataset&&e.target.dataset.f;
+  if(f){P[f]=e.target.value;store.set('eps_profile',P);}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target&&e.target.id==='typed'){A.typed();}
+});
+
+render();
+
+if(window.__EPS_TEST)window.__EPS_TEST={sino:sino,native:native,josa:josa,sim:sim,build:build,monthKo:monthKo,interview:interview,P:P};
+})();
+</script>
+</body>
+</html>
